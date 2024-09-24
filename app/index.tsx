@@ -1,32 +1,37 @@
 import * as React from "react";
 import { View, Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { registerRootComponent } from "expo";
 
-function HomeScreen() {
+import { registerRootComponent } from "expo";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
+import NoteScreen from "./notes/note_screen";
+import CalendarScreen from "./calendar/calendar_screen";
+import AddNoteScreen from "./notes/add_note_screen";
+import AddEventScreen from "./calendar/add_event_screen";
+
+const Tab = createBottomTabNavigator();
+const RootStack = createStackNavigator();
+
+function TabNavigator() {
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Text>Tela inicial</Text>
-    </View>
+    <Tab.Navigator>
+      <Tab.Screen name="Notas" component={NoteScreen} />
+      <Tab.Screen name="Calendário" component={CalendarScreen} />
+    </Tab.Navigator>
   );
 }
-
-const Stack = createNativeStackNavigator();
 
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home2" component={HomeScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        <RootStack.Screen name="main" component={TabNavigator} />
+        <RootStack.Group screenOptions={{ presentation: "modal" }}>
+          <RootStack.Screen name="AddNote" component={AddNoteScreen} />
+          <RootStack.Screen name="AddEvent" component={AddEventScreen} />
+        </RootStack.Group>
+      </RootStack.Navigator>
     </NavigationContainer>
   );
 }
