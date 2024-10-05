@@ -1,7 +1,7 @@
 import * as React from "react";
 import { View, Text, Button } from "react-native";
 
-function NoteScreen({ navigation }) {
+function NotesScreen({ navigation }: any) {
   return (
     <View
       style={{
@@ -21,4 +21,4 @@ function NoteScreen({ navigation }) {
   );
 }
 
-export default NoteScreen;
+export default NotesScreen;
