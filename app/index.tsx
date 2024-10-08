@@ -9,6 +9,7 @@ import CalendarScreen from "./calendar/calendar_screen";
 import AddNoteScreen from "./notes/add_note_screen";
 import AddEventScreen from "./calendar/add_event_screen";
 import { Ionicons } from "@expo/vector-icons";
+import { NoteContext } from "./note_context";
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
@@ -37,16 +38,23 @@ function TabNavigator() {
 }
 
 function App() {
+  const [notes, setNotes] = React.useState<Note[]>([]);
+  const addNote = (note: Note) => {
+    setNotes([...notes, note]);
+  };
+
   return (
-    <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        <RootStack.Screen name="main" component={TabNavigator} />
-        <RootStack.Group screenOptions={{ presentation: "modal" }}>
-          <RootStack.Screen name="AddNote" component={AddNoteScreen} />
-          <RootStack.Screen name="AddEvent" component={AddEventScreen} />
-        </RootStack.Group>
-      </RootStack.Navigator>
-    </NavigationContainer>
+    <NoteContext.Provider value={{ notes, addNote }}>
+      <NavigationContainer>
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          <RootStack.Screen name="main" component={TabNavigator} />
+          <RootStack.Group screenOptions={{ presentation: "modal" }}>
+            <RootStack.Screen name="AddNote" component={AddNoteScreen} />
+            <RootStack.Screen name="AddEvent" component={AddEventScreen} />
+          </RootStack.Group>
+        </RootStack.Navigator>
+      </NavigationContainer>
+    </NoteContext.Provider>
   );
 }
 

@@ -1,7 +1,10 @@
 import * as React from "react";
 import { View, Text, Button } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import { NoteContext } from "../note_context";
 
 function NotesScreen({ navigation }: any) {
+  const { notes } = React.useContext(NoteContext);
   return (
     <View
       style={{
@@ -10,7 +13,10 @@ function NotesScreen({ navigation }: any) {
         justifyContent: "center",
       }}
     >
-      <Text>Notas</Text>
+      <FlatList
+        data={notes}
+        renderItem={({ item }) => <Text>{item.content}</Text>}
+      />
       <Button
         title="Adicionar nota"
         onPress={() => {
