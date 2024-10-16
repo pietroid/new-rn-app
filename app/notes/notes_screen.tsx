@@ -15,7 +15,7 @@ function NotesScreen({ navigation }: any) {
     >
       <FlatList
         data={notes}
-        renderItem={({ item }) => <Text>{item.content}</Text>}
+        renderItem={({ item }) => <Text key={item.id}>{item.content}</Text>}
       />
       <Button
         title="Adicionar nota"

@@ -6,7 +6,7 @@ import NotesRepository from "./data/notes_repository";
 import { NoteContext } from "../note_context";
 
 function AddNoteScreen({ navigation }: any) {
-  const { notes, addNote } = React.useContext(NoteContext);
+  const { notes, addNoteByContent } = React.useContext(NoteContext);
   const [noteContent, setNoteContent] = React.useState("");
   return (
     <View>
@@ -20,13 +20,7 @@ function AddNoteScreen({ navigation }: any) {
         <Button
           title="Salvar"
           onPress={() => {
-            console.log(notes);
-            let newNote: Note = {
-              id: (notes.length + 1).toString(),
-              modifiedAt: new Date(),
-              content: noteContent,
-            };
-            addNote(newNote);
+            addNoteByContent(noteContent);
             navigation.goBack();
           }}
         />

@@ -10,6 +10,7 @@ import AddNoteScreen from "./notes/add_note_screen";
 import AddEventScreen from "./calendar/add_event_screen";
 import { Ionicons } from "@expo/vector-icons";
 import { NoteContext } from "./note_context";
+import NotesRepository from "./notes/data/notes_repository";
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
@@ -39,12 +40,22 @@ function TabNavigator() {
 
 function App() {
   const [notes, setNotes] = React.useState<Note[]>([]);
-  const addNote = (note: Note) => {
-    setNotes([...notes, note]);
+  const notesRepository = new NotesRepository();
+  const addNoteByContent = async (note: string) => {
+    let noteAdded: Note = await notesRepository.addNoteByContent(note);
+    let newNotes = [noteAdded, ...notes];
+    setNotes(newNotes);
   };
 
+  //Debug this
+  React.useEffect(() => {
+    notesRepository.fetchFirstNotes(10).then((notes) => {
+      setNotes(notes);
+    });
+  }, []);
+
   return (
-    <NoteContext.Provider value={{ notes, addNote }}>
+    <NoteContext.Provider value={{ notes, addNoteByContent }}>
       <NavigationContainer>
         <RootStack.Navigator screenOptions={{ headerShown: false }}>
           <RootStack.Screen name="main" component={TabNavigator} />

@@ -3,38 +3,65 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const NOTE_KEY = "NOTE";
 
 class NotesRepository {
-  fetchNotes = async (request: PaginatedRequest): Promise<Note[]> => {
-    let lastNoteId = await AsyncStorage.getItem("lastNoteId");
+  fetchFirstNotes = async (pageSize: number): Promise<Note[]> => {
+    let lastNoteId = parseInt(
+      (await AsyncStorage.getItem("lastNoteId")) ?? "0"
+    );
     if (!lastNoteId) {
       return [];
-    }
-
-    let requestedLastNoteId = request.firstNoteId + request.pageSize;
-    if (requestedLastNoteId > parseInt(lastNoteId)) {
-      requestedLastNoteId = parseInt(lastNoteId);
     }
 
     let values = (
       await AsyncStorage.multiGet([
         ...Array.from(
-          { length: requestedLastNoteId - request.firstNoteId + 1 },
-          (_, i) => `${NOTE_KEY}_${(request.firstNoteId + i).toString()}`
+          { length: Math.min(pageSize, lastNoteId) },
+          (_, i) => `${NOTE_KEY}_${(lastNoteId - i).toString()}`
         ),
       ])
-    ).map(([, value]) => JSON.parse(value ?? ""));
+    ).map(([, value]) => JSON.parse(value ?? "{}"));
 
     return values;
   };
 
-  addNote = async (note: Note): Promise<void> => {
+  fetchNotes = async (request: PaginatedRequest): Promise<Note[]> => {
+    let lastNoteId = parseInt(
+      (await AsyncStorage.getItem("lastNoteId")) ?? "0"
+    );
+    if (!lastNoteId) {
+      return [];
+    }
+
+    let pageSize =
+      request.lastNoteId > request.pageSize
+        ? request.pageSize
+        : request.lastNoteId;
+
+    let values = (
+      await AsyncStorage.multiGet([
+        ...Array.from(
+          { length: pageSize },
+          (_, i) => `${NOTE_KEY}_${(request.lastNoteId - i).toString()}`
+        ),
+      ])
+    ).map(([, value]) => JSON.parse(value ?? "{}"));
+
+    return values;
+  };
+
+  addNoteByContent = async (noteContent: string): Promise<Note> => {
     let lastNoteId = await AsyncStorage.getItem("lastNoteId");
     let newNoteId = lastNoteId ? parseInt(lastNoteId) + 1 : 1;
-
+    let newNote: Note = {
+      id: newNoteId.toString(),
+      content: noteContent,
+      modifiedAt: new Date(),
+    };
     await AsyncStorage.setItem(
       `${NOTE_KEY}_${newNoteId.toString()}`,
-      JSON.stringify(note)
+      JSON.stringify(newNote)
     );
     await AsyncStorage.setItem("lastNoteId", newNoteId.toString());
+    return newNote;
   };
 
   editNote = async (note: Note): Promise<void> => {
@@ -43,7 +70,7 @@ class NotesRepository {
 }
 
 interface PaginatedRequest {
-  firstNoteId: number;
+  lastNoteId: number;
   pageSize: number;
 }
 
